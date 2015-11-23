@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TP_YARR_APP</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="your_subreddits">Your subreddits</string>
+    <string name="action_settings">Settings</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="help">Help</string>
+
+</resources>
