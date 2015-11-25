@@ -1,40 +1,30 @@
 package archon.tp_yarr_app;
 
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.support.v7.app.ActionBar;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends NavigationDrawerActivity {
-
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
+public class ThreadsActivity extends NavigationDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawer_layout);
+        setContentView(R.layout.threads_drawer);
         super.setUpDrawer();
         setUpListView();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_threads, menu);
         return true;
     }
 
@@ -43,19 +33,22 @@ public class MainActivity extends NavigationDrawerActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
 
     private void setUpListView() {
-        final ListView listview = (ListView) findViewById(R.id.subreddits_list);
-        String[] values = new String[] { "Hearthstone", "Androiddev", "Destinygame", "HPMOR",
-                "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
-                "undertale", "fallout", "discordian", "hacking", "gamedev"
+        final ListView listview = (ListView) findViewById(R.id.threads_list);
+        String[] values = new String[]{"How to do a barrel roll?", "Look at this funny cat!",
+                "I want to kill superman please help!!!", "I am confused by the deckslots!",
+                "Do people with lisp think with lisp?", "Just drafted 7 Dr. Booms in arena..."
         };
 
         final ArrayList<String> list = new ArrayList<String>();
@@ -71,17 +64,14 @@ public class MainActivity extends NavigationDrawerActivity {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, final View view,
                                                                     int position, long id) {
-                                                openSubreddit();
+                                                //openSubreddit();
                                             }
                                         }
         );
-
-
-
     }
 
-    private void openSubreddit() {
-        Intent i = new Intent(this, ThreadsActivity.class);
-        startActivity(i);
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
     }
 }

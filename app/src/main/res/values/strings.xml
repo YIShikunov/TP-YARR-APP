@@ -10,5 +10,8 @@
     <string name="help">Help</string>
     <string name="open_drawer">open_drawer</string>
     <string name="close_drawer">close_drawer</string>
+    <string name="title_activity_threads">ThreadsActivity</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
 
 </resources>
