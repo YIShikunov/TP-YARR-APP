@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+        android:summary="Favorite number"
+        android:title="Favorite number" >
+        <EditTextPreference
+            android:key="number"
+            android:summary="Please enter your favorite number"
+            android:title="Number" />
+    </PreferenceCategory>
+</PreferenceScreen>

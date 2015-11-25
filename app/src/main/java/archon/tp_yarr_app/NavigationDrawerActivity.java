@@ -79,10 +79,10 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
                         return true;
                     case R.id.menu_item_settings:
-
+                        openSettings();
                         return true;
                     case R.id.menu_item_help:
-
+                        openHelp();
                         return true;
                     default:
                         return true;
@@ -97,5 +97,15 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
+    }
+
+    protected void openHelp() {
+        Intent i = new Intent(this, HelpActivity.class);
+        startActivity(i);
+    }
+
+    protected void openSettings() {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
     }
 }
