@@ -1,8 +1,8 @@
-package archon.tp_yarr_app;
+package archon.tp_yarr_app.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import archon.tp_yarr_app.R;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
 
@@ -76,7 +78,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                         openMainScreen();
                         return true;
                     case R.id.menu_item_login:
-
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.reddit.com"));
+                        startActivity(browserIntent);
                         return true;
                     case R.id.menu_item_settings:
                         openSettings();

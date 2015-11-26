@@ -8,24 +8,24 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".ThreadsActivity"
+            android:name=".Activities.ThreadsActivity"
             android:label="@string/title_activity_threads"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".Activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="archon.tp_yarr_app.MainActivity" />
+                android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".NavigationDrawerActivity"
+            android:name=".Activities.NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer" >
         </activity>
         <activity
-            android:name=".SplashScreenActivity"
-            android:label="@string/title_activity_splash_screen" >
+            android:name=".Activities.SplashScreenActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,12 +33,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HelpActivity"
+            android:name=".Activities.HelpActivity"
             android:label="@string/title_activity_help" >
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name=".Activities.CommentsActivity"
+            android:label="@string/title_activity_comments"
+            android:parentActivityName=".Activities.ThreadsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activities.ThreadsActivity" />
         </activity>
     </application>
 

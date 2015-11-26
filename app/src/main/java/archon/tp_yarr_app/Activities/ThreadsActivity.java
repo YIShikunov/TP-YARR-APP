@@ -1,6 +1,6 @@
-package archon.tp_yarr_app;
+package archon.tp_yarr_app.Activities;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+
+import archon.tp_yarr_app.R;
 
 public class ThreadsActivity extends NavigationDrawerActivity {
 
@@ -64,7 +66,7 @@ public class ThreadsActivity extends NavigationDrawerActivity {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, final View view,
                                                                     int position, long id) {
-                                                //openSubreddit();
+                                                openComments();
                                             }
                                         }
         );
@@ -73,5 +75,11 @@ public class ThreadsActivity extends NavigationDrawerActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+    }
+
+
+    private void openComments() {
+        Intent i = new Intent(this, CommentsActivity.class);
+        startActivity(i);
     }
 }

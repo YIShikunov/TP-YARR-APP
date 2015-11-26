@@ -1,4 +1,4 @@
-package archon.tp_yarr_app;
+package archon.tp_yarr_app.Activities;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import archon.tp_yarr_app.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
