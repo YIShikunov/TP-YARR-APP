@@ -1,6 +1,5 @@
 package archon.tp_yarr_app.Fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,20 +9,14 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.content.Context;
+
+import java.util.ArrayList;
 
 import archon.tp_yarr_app.R;
-import archon.tp_yarr_app.Fragments.dummy.DummyContent;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
- */
 public class subredditFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
@@ -38,10 +31,6 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
         return fragment;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public subredditFragment() {
     }
 
@@ -53,33 +42,39 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
             /*mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);*/
         }
+        String[] values = new String[] { "Hearthstone", "Androiddev", "Destinygame", "HPMOR",
+                "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
+                "undertale", "fallout", "discordian", "hacking", "gamedev"
+        };
 
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        final ArrayList<String> list = new ArrayList<String>();
+        for (int i = 0; i < values.length; ++i) {
+            list.add(values[i]);
+        }
+
+        mAdapter = new ArrayAdapter(getActivity(),
+                android.R.layout.simple_list_item_1, list);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
+        View view = inflater.inflate(R.layout.fragment_subreddit_list, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+        mListView = (ListView) view.findViewById(R.id.subreddits_list);
+        mListView.setAdapter(mAdapter);
 
         return view;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -95,7 +90,7 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
     }
 
@@ -126,5 +121,4 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
-
 }
