@@ -20,7 +20,7 @@
                 android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.NavigationDrawerActivity"
+            android:name=".NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer" >
         </activity>
         <activity
@@ -48,6 +48,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.ThreadsActivity" />
         </activity>
+
+        <service
+            android:name=".RedditService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

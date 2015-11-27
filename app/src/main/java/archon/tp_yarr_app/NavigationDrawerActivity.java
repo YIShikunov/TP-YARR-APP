@@ -1,25 +1,21 @@
-package archon.tp_yarr_app.Activities;
+package archon.tp_yarr_app;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import archon.tp_yarr_app.Activities.HelpActivity;
+import archon.tp_yarr_app.Activities.MainActivity;
+import archon.tp_yarr_app.Activities.SettingsActivity;
 
-import archon.tp_yarr_app.Fragments.SubredditFragment;
-import archon.tp_yarr_app.Fragments.ThreadsFragment;
-import archon.tp_yarr_app.R;
-
-public class MainActivity extends AppCompatActivity implements SubredditFragment.OnFragmentInteractionListener {
+public class NavigationDrawerActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -28,24 +24,22 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setUpDrawer();
 
-        if (savedInstanceState == null) {
-            // During initial setup, plug in the details fragment.
-            SubredditFragment details = new SubredditFragment();
-            details.setArguments(getIntent().getExtras());
-            getFragmentManager().beginTransaction().add(R.id.list_container, details).commit();
-        }
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -86,8 +80,7 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
                         openMainScreen();
                         return true;
                     case R.id.menu_item_login:
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.reddit.com"));
-                        startActivity(browserIntent);
+
                         return true;
                     case R.id.menu_item_settings:
                         openSettings();
@@ -105,9 +98,9 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     }
 
     protected void openMainScreen() {
-        //Intent i = new Intent(this, MainActivity.class);
-        //startActivity(i);
-        //finish();
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 
     protected void openHelp() {
@@ -118,27 +111,5 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     protected void openSettings() {
         Intent i = new Intent(this, SettingsActivity.class);
         startActivity(i);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
-
-
-    private void openSubreddit() {
-        Fragment newFragment = new ThreadsFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.list_container, newFragment);
-
-        transaction.commit();
-    }
-
-    public void onFragmentInteraction(String id) {
-        Toast.makeText(this, "Open sub", Toast.LENGTH_SHORT).show();
-        openSubreddit();
     }
 }

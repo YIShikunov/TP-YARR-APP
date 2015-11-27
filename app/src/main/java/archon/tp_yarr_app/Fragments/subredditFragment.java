@@ -1,7 +1,9 @@
 package archon.tp_yarr_app.Fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,26 +14,27 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Context;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import archon.tp_yarr_app.R;
 
-public class subredditFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class SubredditFragment extends Fragment implements ListView.OnItemClickListener {
 
     private OnFragmentInteractionListener mListener;
     private AbsListView mListView;
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static subredditFragment newInstance() {
-        subredditFragment fragment = new subredditFragment();
+    public static SubredditFragment newInstance() {
+        SubredditFragment fragment = new SubredditFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public subredditFragment() {
+    public SubredditFragment() {
     }
 
     @Override
@@ -42,7 +45,7 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
             /*mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);*/
         }
-        String[] values = new String[] { "Hearthstone", "Androiddev", "Destinygame", "HPMOR",
+        String[] values = new String[] { "hearthstone", "Androiddev", "Destinygame", "HPMOR",
                 "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
                 "undertale", "fallout", "discordian", "hacking", "gamedev"
         };
@@ -65,16 +68,28 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
         mListView = (ListView) view.findViewById(R.id.subreddits_list);
         mListView.setAdapter(mAdapter);
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                             @Override
+                                             public void onItemClick(AdapterView<?> parent, final View view,
+                                                                     int position, long id) {
+                                                 Toast.makeText(getActivity(), "Click1", Toast.LENGTH_SHORT).show();
+                                                 mListener.onFragmentInteraction("0");
+                                             }
+                                         }
+        );
         return view;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        //Activity activity = (Activity) context;
         try {
-            mListener = (OnFragmentInteractionListener) context;
+            mListener = (OnFragmentInteractionListener) activity;
+            Toast.makeText(getActivity(), "Attach", Toast.LENGTH_SHORT).show();
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
+            throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -87,10 +102,12 @@ public class subredditFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(getActivity(), "Click2", Toast.LENGTH_SHORT).show();
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             // mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mListener.onFragmentInteraction("0");
         }
     }
 
