@@ -2,7 +2,10 @@ package archon.tp_yarr_app.Activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -15,15 +18,27 @@ import android.view.View;
 import android.widget.Toast;
 
 
+import archon.tp_yarr_app.Fragments.CommentsFragment;
 import archon.tp_yarr_app.Fragments.SubredditFragment;
 import archon.tp_yarr_app.Fragments.ThreadsFragment;
 import archon.tp_yarr_app.R;
+import archon.tp_yarr_app.RedditService;
 
 public class MainActivity extends AppCompatActivity implements SubredditFragment.OnFragmentInteractionListener {
 
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView mNavigationView;
+    protected DrawerLayout mDrawerLayout;
+    protected ActionBarDrawerToggle mDrawerToggle;
+    protected NavigationView mNavigationView;
+
+    protected String mode;
+
+    protected static final String MODE_SUBREDDITS = "SUBREDDITS";
+    protected static final String MODE_THREADS = "THREADS";
+    protected static final String MODE_COMMENTS = "COMMENTS";
+
+    protected SubredditFragment subredditFragment;
+    protected ThreadsFragment threadsFragment;
+    protected CommentsFragment commentsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,33 +47,22 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         setUpDrawer();
 
         if (savedInstanceState == null) {
-            // During initial setup, plug in the details fragment.
-            SubredditFragment details = new SubredditFragment();
-            details.setArguments(getIntent().getExtras());
-            getFragmentManager().beginTransaction().add(R.id.list_container, details).commit();
+            switchToMain();
         }
-
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
     }
 
+    protected void switchToMain() {
+        subredditFragment = new SubredditFragment();
+        subredditFragment.setArguments(getIntent().getExtras());
+        getFragmentManager().beginTransaction().add(R.id.list_container, subredditFragment).commit();
+    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    protected void switchToThreads(String subreddit) {
 
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+    }
 
-        return super.onOptionsItemSelected(item);
+    protected void switchToComments(String thread) {
+
     }
 
     protected void setUpDrawer() {
@@ -120,13 +124,6 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         startActivity(i);
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
-
-
     private void openSubreddit() {
         Fragment newFragment = new ThreadsFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -140,5 +137,55 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     public void onFragmentInteraction(String id) {
         Toast.makeText(this, "Open sub", Toast.LENGTH_SHORT).show();
         openSubreddit();
+
+    }
+
+    private void loadSubreddits() {
+
+        Intent intent = new Intent(this, RedditService.class);
+        startService(intent);
+    }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (subredditFragment != null)
+                subredditFragment.setList(bundle.getStringArray("subs"));
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(RedditService.NOTIFICATION));
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
     }
 }

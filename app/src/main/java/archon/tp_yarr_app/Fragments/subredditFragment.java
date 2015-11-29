@@ -138,4 +138,10 @@ public class SubredditFragment extends Fragment implements ListView.OnItemClickL
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
+
+    public void setList(String[] array) {
+        mAdapter = new ArrayAdapter(getActivity(),
+                        android.R.layout.simple_list_item_1, array);
+        mListView.setAdapter(mAdapter);
+    }
 }
