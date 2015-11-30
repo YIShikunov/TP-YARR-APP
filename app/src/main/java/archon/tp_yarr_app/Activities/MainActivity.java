@@ -1,5 +1,6 @@
 package archon.tp_yarr_app.Activities;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import archon.tp_yarr_app.Fragments.CommentsFragment;
 import archon.tp_yarr_app.Fragments.SubredditFragment;
 import archon.tp_yarr_app.Fragments.ThreadsFragment;
+import archon.tp_yarr_app.OAuth;
 import archon.tp_yarr_app.R;
 import archon.tp_yarr_app.RedditService;
 
@@ -106,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
                         openMainScreen();
                         return true;
                     case R.id.menu_item_login:
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.reddit.com"));
-                        startActivity(browserIntent);
+                        initiateLogin();
                         return true;
                     case R.id.menu_item_settings:
                         openSettings();
@@ -122,6 +123,10 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         });
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    protected void initiateLogin() {
+        OAuth.initiateLogin(this);
     }
 
     protected void openMainScreen() {

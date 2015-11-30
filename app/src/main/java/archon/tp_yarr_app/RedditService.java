@@ -56,7 +56,6 @@ public class RedditService extends IntentService {
     }
 
     private String[] loadFrontPage() {
-        imitateWork(200);
         return getFakeSubreddit();
     }
 
@@ -68,9 +67,4 @@ public class RedditService extends IntentService {
         return values;
     }
 
-    private void imitateWork(int n) {
-        int i = (new Random()).nextInt(n);
-        while (i != 42)
-            i = (new Random()).nextInt(n);
-    }
 }
