@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="URL">https://www.reddit.com/api/v1/authorize?</string>
+
+    <string name="client_id">client_id=</string>
+    <string name="CLIENT_ID">Ogd-nN_lj6TUGQ</string>
+
+    <string name="response_type">response_type=</string>
+    <string name="TYPE">token</string>
+
+    <string name="state">state=</string>
+    <!-- A random string of my choosing -->
+
+    <string name="redirect_uri">redirect_uri=</string>
+    <string name="RED_URI">tpyarr://auth</string>
+
+    <string name="scope">scope=</string>
+    <string name="SCOPE">identity,edit,flair,history,mysubreddits,submit,subscribe,vote</string>
+</resources>
