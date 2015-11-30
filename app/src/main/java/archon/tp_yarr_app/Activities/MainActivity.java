@@ -52,17 +52,33 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     }
 
     protected void switchToMain() {
-        subredditFragment = new SubredditFragment();
-        subredditFragment.setArguments(getIntent().getExtras());
-        getFragmentManager().beginTransaction().add(R.id.list_container, subredditFragment).commit();
+        if (subredditFragment == null)
+            subredditFragment = new SubredditFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.list_container, subredditFragment);
+        transaction.commit();
+        mode = MODE_SUBREDDITS;
+        getSubreddits();
     }
 
     protected void switchToThreads(String subreddit) {
-
+        if (threadsFragment == null)
+            threadsFragment = new ThreadsFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.addToBackStack("subs");
+        transaction.replace(R.id.list_container, threadsFragment, "subs");
+        transaction.commit();
+        mode = MODE_THREADS;
     }
 
     protected void switchToComments(String thread) {
-
+        if (commentsFragment == null)
+            commentsFragment = new CommentsFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.addToBackStack("thread");
+        transaction.replace(R.id.list_container, commentsFragment, "thread");
+        transaction.commit();
+        mode = MODE_COMMENTS;
     }
 
     protected void setUpDrawer() {
@@ -109,9 +125,7 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     }
 
     protected void openMainScreen() {
-        //Intent i = new Intent(this, MainActivity.class);
-        //startActivity(i);
-        //finish();
+        switchToMain();
     }
 
     protected void openHelp() {
@@ -134,15 +148,16 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         transaction.commit();
     }
 
-    public void onFragmentInteraction(String id) {
-        Toast.makeText(this, "Open sub", Toast.LENGTH_SHORT).show();
-        openSubreddit();
-
+    public void onFragmentInteraction(String item) {
+        Toast.makeText(this, item, Toast.LENGTH_SHORT).show();
+        if (mode.equals(MODE_SUBREDDITS)) {
+            switchToThreads(item);
+        }
     }
 
-    private void loadSubreddits() {
-
+    private void getSubreddits() {
         Intent intent = new Intent(this, RedditService.class);
+        intent.putExtra(RedditService.TYPE, RedditService.FRONT_PAGE);
         startService(intent);
     }
 
@@ -150,8 +165,8 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            if (subredditFragment != null)
-                subredditFragment.setList(bundle.getStringArray("subs"));
+            if (subredditFragment != null && mode == MODE_SUBREDDITS)
+                subredditFragment.setList(bundle.getStringArray(RedditService.RESULT));
         }
     };
 
@@ -187,5 +202,18 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() > 0 ){
+            getFragmentManager().popBackStack();
+            if (mode.equals(MODE_COMMENTS))
+                mode = MODE_THREADS;
+            else
+                mode = MODE_SUBREDDITS;
+        } else {
+            super.onBackPressed();
+        }
     }
 }
