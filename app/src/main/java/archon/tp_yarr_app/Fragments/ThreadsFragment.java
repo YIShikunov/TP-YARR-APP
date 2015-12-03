@@ -1,5 +1,6 @@
 package archon.tp_yarr_app.Fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,19 +22,11 @@ import archon.tp_yarr_app.R;
 /**
  * Created by Artem on 26-Nov-15.
  */
-public class ThreadsFragment extends Fragment implements AbsListView.OnItemClickListener  {
+public class ThreadsFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
+    private SubredditFragment.OnFragmentInteractionListener mListener;
     private AbsListView mListView;
     private ListAdapter mAdapter;
-
-    // TODO: Rename and change types of parameters
-    public static ThreadsFragment newInstance() {
-        ThreadsFragment fragment = new ThreadsFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public ThreadsFragment() {
     }
@@ -41,23 +34,8 @@ public class ThreadsFragment extends Fragment implements AbsListView.OnItemClick
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            /*mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);*/
-        }
-        String[] values = new String[] { "How to do a barrel roll?", "Look at this funny cat!",
-                "I want to kill superman please help!!!", "I am confused by the deckslots!",
-                "Do people with lisp think with lisp?", "Just drafted 7 Dr. Booms in arena..."
-        };
-
-        final ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; ++i) {
-            list.add(values[i]);
-        }
-
         mAdapter = new ArrayAdapter(getActivity(),
-                android.R.layout.simple_list_item_1, list);
+                android.R.layout.simple_list_item_1, new ArrayList<String>());
     }
 
     @Override
@@ -65,21 +43,29 @@ public class ThreadsFragment extends Fragment implements AbsListView.OnItemClick
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_thread_list, container, false);
 
-        // Set the adapter
         mListView = (ListView) view.findViewById(R.id.threads_list);
         mListView.setAdapter(mAdapter);
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                             @Override
+                                             public void onItemClick(AdapterView<?> parent, final View view,
+                                                                     int position, long id) {
+                                                 if (mListener != null)
+                                                     mListener.onFragmentInteraction(position);
+                                             }
+                                         }
+        );
         return view;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) context;
-            Toast.makeText(getActivity(), "Attach", Toast.LENGTH_SHORT).show();
+            mListener = (SubredditFragment.OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
+            throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -89,17 +75,14 @@ public class ThreadsFragment extends Fragment implements AbsListView.OnItemClick
         super.onDetach();
         mListener = null;
     }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            Toast.makeText(getActivity(), "Click", Toast.LENGTH_SHORT).show();
-            mListener.onFragmentInteraction("0");
-        }
-    }
-
+/*
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        void onFragmentInteraction(int position);
+    }*/
+
+    public void setList(String[] array) {
+        mAdapter = new ArrayAdapter(getActivity(),
+                android.R.layout.simple_list_item_1, array);
+        mListView.setAdapter(mAdapter);
     }
 }

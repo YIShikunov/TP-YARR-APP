@@ -1,4 +1,4 @@
-package archon.tp_yarr_app;
+package archon.tp_yarr_app.Activities;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -14,6 +14,7 @@ import android.view.View;
 import archon.tp_yarr_app.Activities.HelpActivity;
 import archon.tp_yarr_app.Activities.MainActivity;
 import archon.tp_yarr_app.Activities.SettingsActivity;
+import archon.tp_yarr_app.R;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
 

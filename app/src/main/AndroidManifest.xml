@@ -20,7 +20,7 @@
                 android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".NavigationDrawerActivity"
+            android:name=".Activities.NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer" >
         </activity>
         <activity
