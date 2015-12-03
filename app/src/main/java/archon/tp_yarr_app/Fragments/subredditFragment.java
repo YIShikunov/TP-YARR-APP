@@ -58,7 +58,7 @@ public class SubredditFragment extends Fragment {
                                              @Override
                                              public void onItemClick(AdapterView<?> parent, final View view,
                                                                      int position, long id) {
-                                                 mListener.onFragmentInteraction((String) mAdapter.getItem(position));
+                                                 mListener.onFragmentInteraction(position);
                                              }
              }
         );
@@ -86,7 +86,7 @@ public class SubredditFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String item_id);
+        public void onFragmentInteraction(int position);
     }
 
     public void setList(String[] array) {

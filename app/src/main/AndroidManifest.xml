@@ -54,6 +54,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+        <service
+            android:name=".RedditController"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
 
         <activity
             android:name=".Activities.LoginActivity"

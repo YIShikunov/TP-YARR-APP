@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class RedditAPI {
 
-    public static String[] getSubreddits() {
+    public static String[] loadSubreddits() {
         imitateWork(500);
-        String[] values = new String[] { "Androiddev", "Destinygame", "HPMOR", "hearthstone",
+        String[] values = new String[] { "API", "Destinygame", "HPMOR", "hearthstone",
                 "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
                 "undertale", "fallout", "hacking", "gamedev"
         };

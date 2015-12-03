@@ -2,6 +2,7 @@ package archon.tp_yarr_app.Activities;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,6 +25,7 @@ import archon.tp_yarr_app.Fragments.SubredditFragment;
 import archon.tp_yarr_app.Fragments.ThreadsFragment;
 import archon.tp_yarr_app.OAuth;
 import archon.tp_yarr_app.R;
+import archon.tp_yarr_app.RedditController;
 import archon.tp_yarr_app.RedditService;
 
 public class MainActivity extends AppCompatActivity implements SubredditFragment.OnFragmentInteractionListener {
@@ -42,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     protected ThreadsFragment threadsFragment;
     protected CommentsFragment commentsFragment;
 
+    protected String[] subreddits;
+    protected String[] threads;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,23 +60,26 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     }
 
     protected void switchToMain() {
-        if (subredditFragment == null)
-            subredditFragment = new SubredditFragment();
+        subredditFragment = new SubredditFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.list_container, subredditFragment);
         transaction.commit();
         mode = MODE_SUBREDDITS;
-        getSubreddits();
+        Intent intent = new Intent(this, RedditController.class);
+        intent.putExtra(RedditController.TYPE, RedditController.HELP_OPENED_SUBREDDITS);
+        startService(intent);
     }
 
-    protected void switchToThreads(String subreddit) {
-        if (threadsFragment == null)
-            threadsFragment = new ThreadsFragment();
+    protected void switchToThreads() {
+        threadsFragment = new ThreadsFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.addToBackStack("subs");
         transaction.replace(R.id.list_container, threadsFragment, "subs");
         transaction.commit();
         mode = MODE_THREADS;
+        Intent intent = new Intent(this, RedditController.class);
+        intent.putExtra(RedditController.TYPE, RedditController.HELP_OPENED_THREAD);
+        startService(intent);
     }
 
     protected void switchToComments(String thread) {
@@ -130,6 +139,11 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     }
 
     protected void openMainScreen() {
+        FragmentManager manager = getFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
+            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         switchToMain();
     }
 
@@ -143,42 +157,48 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         startActivity(i);
     }
 
-    private void openSubreddit() {
-        Fragment newFragment = new ThreadsFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.list_container, newFragment);
-
-        transaction.commit();
-    }
-
-    public void onFragmentInteraction(String item) {
-        Toast.makeText(this, item, Toast.LENGTH_SHORT).show();
+    public void onFragmentInteraction(int id) {
         if (mode.equals(MODE_SUBREDDITS)) {
-            switchToThreads(item);
+            Intent intent = new Intent(this, RedditController.class);
+            intent.putExtra(RedditController.TYPE, RedditController.HELP_CLICKED_SUBREDDIT);
+            intent.putExtra(RedditController.ID, id);
+            startService(intent);
+            switchToThreads();
         }
-    }
-
-    private void getSubreddits() {
-        Intent intent = new Intent(this, RedditService.class);
-        intent.putExtra(RedditService.TYPE, RedditService.FRONT_PAGE);
-        startService(intent);
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            if (subredditFragment != null && mode == MODE_SUBREDDITS)
-                subredditFragment.setList(bundle.getStringArray(RedditService.RESULT));
+            switch (intent.getStringExtra(RedditController.TYPE)) {
+                case RedditController.SET_SUBREDDITS:
+                    setSubreddits(bundle);
+                    break;
+                case RedditController.SET_THREADS:
+                    setThreads(bundle);
+                    break;
+                default:
+                    break;
+            }
         }
     };
+
+    private void setSubreddits(Bundle bundle) {
+        subreddits = bundle.getStringArray(RedditController.RESULT);
+        subredditFragment.setList(bundle.getStringArray(RedditController.RESULT));
+    }
+
+    private void setThreads(Bundle bundle) {
+        threads = bundle.getStringArray(RedditController.RESULT);
+        //threadsFragment.setList(bundle.getStringArray(RedditController.RESULT));
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(receiver, new IntentFilter(RedditService.NOTIFICATION));
+        registerReceiver(receiver, new IntentFilter(RedditController.NOTIFICATION));
     }
     @Override
     protected void onPause() {
@@ -219,6 +239,17 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
                 mode = MODE_SUBREDDITS;
         } else {
             super.onBackPressed();
+        }
+    }
+
+    protected void updateFragments() {
+        switch (mode) {
+            case MODE_SUBREDDITS:
+                subredditFragment.setList(subreddits);
+                break;
+            case MODE_THREADS:
+                //threadsFragment.setList(threads);
+                break;
         }
     }
 }

@@ -56,15 +56,7 @@ public class RedditService extends IntentService {
     }
 
     private String[] loadFrontPage() {
-        return getFakeSubreddit();
-    }
-
-    private String[] getFakeSubreddit() {
-        String[] values = new String[] { "Androiddev", "Destinygame", "HPMOR",
-                "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
-                "undertale", "fallout", "hacking", "gamedev"
-        };
-        return values;
+        return RedditAPI.loadSubreddits();
     }
 
 }
