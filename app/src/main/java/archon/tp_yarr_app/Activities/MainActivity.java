@@ -28,11 +28,7 @@ import archon.tp_yarr_app.R;
 import archon.tp_yarr_app.RedditController;
 import archon.tp_yarr_app.RedditService;
 
-public class MainActivity extends AppCompatActivity implements SubredditFragment.OnFragmentInteractionListener {
-
-    protected DrawerLayout mDrawerLayout;
-    protected ActionBarDrawerToggle mDrawerToggle;
-    protected NavigationView mNavigationView;
+public class MainActivity extends NavigationDrawerActivity implements SubredditFragment.OnFragmentInteractionListener {
 
     protected String mode;
 
@@ -46,13 +42,14 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
 
     protected String[] subreddits;
     protected String[] threads;
+    // comments
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpDrawer();
+        super.setUpDrawer();
 
         if (savedInstanceState == null) {
             switchToMain();
@@ -92,52 +89,7 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
         mode = MODE_COMMENTS;
     }
 
-    protected void setUpDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawer, R.string.close_drawer) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                invalidateOptionsMenu();
-            }
-        };
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                switch (menuItem.getItemId()) {
-                    case R.id.menu_item_main:
-                        openMainScreen();
-                        return true;
-                    case R.id.menu_item_login:
-                        initiateLogin();
-                        return true;
-                    case R.id.menu_item_settings:
-                        openSettings();
-                        return true;
-                    case R.id.menu_item_help:
-                        openHelp();
-                        return true;
-                    default:
-                        return true;
-                }
-            }
-        });
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    protected void initiateLogin() {
-        OAuth.initiateLogin(this);
-    }
-
+    @Override
     protected void openMainScreen() {
         FragmentManager manager = getFragmentManager();
         if (manager.getBackStackEntryCount() > 0) {
@@ -145,16 +97,6 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
             manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
         switchToMain();
-    }
-
-    protected void openHelp() {
-        Intent i = new Intent(this, HelpActivity.class);
-        startActivity(i);
-    }
-
-    protected void openSettings() {
-        Intent i = new Intent(this, SettingsActivity.class);
-        startActivity(i);
     }
 
     public void onFragmentInteraction(int id) {
@@ -204,29 +146,6 @@ public class MainActivity extends AppCompatActivity implements SubredditFragment
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
     }
 
     @Override

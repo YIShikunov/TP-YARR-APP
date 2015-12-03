@@ -1,5 +1,6 @@
 package archon.tp_yarr_app.Activities;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
@@ -14,6 +15,7 @@ import android.view.View;
 import archon.tp_yarr_app.Activities.HelpActivity;
 import archon.tp_yarr_app.Activities.MainActivity;
 import archon.tp_yarr_app.Activities.SettingsActivity;
+import archon.tp_yarr_app.OAuth;
 import archon.tp_yarr_app.R;
 
 public class NavigationDrawerActivity extends AppCompatActivity {
@@ -25,28 +27,16 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         return true;
-    }
-
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -54,6 +44,12 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
     }
 
     protected void setUpDrawer() {
@@ -81,7 +77,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                         openMainScreen();
                         return true;
                     case R.id.menu_item_login:
-
+                        initiateLogin();
                         return true;
                     case R.id.menu_item_settings:
                         openSettings();
@@ -98,10 +94,11 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    protected void initiateLogin() {
+        OAuth.initiateLogin(this);
+    }
+
     protected void openMainScreen() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
-        finish();
     }
 
     protected void openHelp() {
