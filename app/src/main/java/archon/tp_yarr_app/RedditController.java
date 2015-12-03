@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import archon.tp_yarr_app.Database.RedditDAO;
@@ -57,17 +59,24 @@ public class RedditController extends IntentService {
     public static final String SET_THREADS = "s";
 
     private void loadSubreddits() {
-        ArrayList<SubredditItem> subreddits = new RedditDAO(getApplication()).getUserSubreddits();
-        ArrayList<String> values = new ArrayList<>();
-        for (SubredditItem s:subreddits) {
-            values.add(s.toString());
+        RedditDAO dao = new RedditDAO(getApplication());
+        try {
+            dao.open();
+            ArrayList<SubredditItem> subreddits = dao.getUserSubreddits();
+            ArrayList<String> values = new ArrayList<>();
+            for (SubredditItem s : subreddits) {
+                values.add(s.toString());
+            }
+            Intent intent = new Intent(NOTIFICATION);
+            Bundle bundle = new Bundle();
+            bundle.putStringArray(RESULT, values.toArray(new String[values.size()]));
+            intent.putExtras(bundle);
+            intent.putExtra(TYPE, SET_SUBREDDITS);
+            sendBroadcast(intent);
+        } catch (SQLException a) {
+            Toast.makeText(getApplication(), "SQL database", Toast.LENGTH_SHORT).show();
         }
-        Intent intent = new Intent(NOTIFICATION);
-        Bundle bundle = new Bundle();
-        bundle.putStringArray(RESULT, (String[])values.toArray());
-        intent.putExtras(bundle);
-        intent.putExtra(TYPE,SET_SUBREDDITS);
-        sendBroadcast(intent);
+        dao.close();
     }
     private void clickSubreddit(int id) {
 
