@@ -29,6 +29,7 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         mAdapter = new ArrayAdapter(getActivity(),
                 android.R.layout.simple_list_item_1, new ArrayList<String>());
     }

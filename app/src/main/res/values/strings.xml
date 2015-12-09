@@ -17,6 +17,7 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_comments">CommentsActivity</string>
 
+    <string name="user_agent">android:archon.tp_yarr_app:v0.0.1 (by /u/thetimujin)</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_login">LoginActivity</string>

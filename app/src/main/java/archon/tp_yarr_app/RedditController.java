@@ -67,16 +67,23 @@ public class RedditController extends IntentService {
             for (SubredditItem s : subreddits) {
                 values.add(s.toString());
             }
-            Intent intent = new Intent(NOTIFICATION);
-            Bundle bundle = new Bundle();
-            bundle.putStringArray(RESULT, values.toArray(new String[values.size()]));
-            intent.putExtras(bundle);
-            intent.putExtra(TYPE, SET_SUBREDDITS);
-            sendBroadcast(intent);
+            sendSubreddits(values);
         } catch (SQLException a) {
             Toast.makeText(getApplication(), "SQL database", Toast.LENGTH_SHORT).show();
         }
         dao.close();
+        sendSubreddits(RedditAPI.loadSubreddits(getApplication()));
+    }
+
+    private void sendSubreddits(ArrayList<String> values) {
+        if (values == null)
+            return;
+        Intent intent = new Intent(NOTIFICATION);
+        Bundle bundle = new Bundle();
+        bundle.putStringArray(RESULT, values.toArray(new String[values.size()]));
+        intent.putExtras(bundle);
+        intent.putExtra(TYPE, SET_SUBREDDITS);
+        sendBroadcast(intent);
     }
     private void clickSubreddit(int id) {
 

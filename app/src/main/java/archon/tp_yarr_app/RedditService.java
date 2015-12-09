@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class RedditService extends IntentService {
+    // mostly deprecated
 
     public static final String NOTIFICATION = "com.archon.android.service.receiver";
     public static final String RESULT = "RESULT";
@@ -56,7 +58,7 @@ public class RedditService extends IntentService {
     }
 
     private String[] loadFrontPage() {
-        return RedditAPI.loadSubreddits();
+        return new String[]{};
     }
 
 }

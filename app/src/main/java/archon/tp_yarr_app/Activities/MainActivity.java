@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 
 import archon.tp_yarr_app.Fragments.CommentsFragment;
+import archon.tp_yarr_app.Fragments.StateFragment;
 import archon.tp_yarr_app.Fragments.SubredditFragment;
 import archon.tp_yarr_app.Fragments.ThreadsFragment;
 import archon.tp_yarr_app.OAuth;
@@ -30,15 +32,17 @@ import archon.tp_yarr_app.RedditService;
 
 public class MainActivity extends NavigationDrawerActivity implements SubredditFragment.OnFragmentInteractionListener {
 
-    protected String mode;
+    public StateFragment stateFragment;
+
+    public String mode;
 
     protected static final String MODE_SUBREDDITS = "SUBREDDITS";
     protected static final String MODE_THREADS = "THREADS";
     protected static final String MODE_COMMENTS = "COMMENTS";
 
-    protected SubredditFragment subredditFragment;
-    protected ThreadsFragment threadsFragment;
-    protected CommentsFragment commentsFragment;
+    public SubredditFragment subredditFragment;
+    public ThreadsFragment threadsFragment;
+    public CommentsFragment commentsFragment;
 
     protected String[] subreddits;
     protected String[] threads;
@@ -51,46 +55,58 @@ public class MainActivity extends NavigationDrawerActivity implements SubredditF
         setContentView(R.layout.activity_main);
         super.setUpDrawer();
 
+        FragmentManager manager = getFragmentManager();
+        stateFragment = (StateFragment) manager.findFragmentByTag("state");
+        if (stateFragment == null) {
+            stateFragment = new StateFragment();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(stateFragment, "state");
+            transaction.commit();
+        }
+
+
         if (savedInstanceState == null) {
             switchToMain();
         }
     }
 
     protected void switchToMain() {
-        subredditFragment = new SubredditFragment();
+        stateFragment.subredditFragment = new SubredditFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.list_container, subredditFragment);
+        transaction.replace(R.id.list_container, stateFragment.subredditFragment);
         transaction.commit();
-        mode = MODE_SUBREDDITS;
+        stateFragment.mode = StateFragment.MODE_SUBREDDITS;
         Intent intent = new Intent(this, RedditController.class);
         intent.putExtra(RedditController.TYPE, RedditController.HELP_OPENED_SUBREDDITS);
         startService(intent);
     }
 
     protected void switchToThreads() {
-        threadsFragment = new ThreadsFragment();
+        stateFragment.threadsFragment = new ThreadsFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.addToBackStack("subs");
-        transaction.replace(R.id.list_container, threadsFragment, "subs");
+        transaction.replace(R.id.list_container, stateFragment.threadsFragment, "subs");
         transaction.commit();
-        mode = MODE_THREADS;
+        stateFragment.mode = StateFragment.MODE_THREADS;
         Intent intent = new Intent(this, RedditController.class);
         intent.putExtra(RedditController.TYPE, RedditController.HELP_OPENED_THREAD);
         startService(intent);
     }
 
     protected void switchToComments(String thread) {
-        if (commentsFragment == null)
+        /*if (commentsFragment == null)
             commentsFragment = new CommentsFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.addToBackStack("thread");
         transaction.replace(R.id.list_container, commentsFragment, "thread");
         transaction.commit();
-        mode = MODE_COMMENTS;
+        mode = MODE_COMMENTS;*/
     }
 
     @Override
     protected void openMainScreen() {
+        // For the navigation drawer button
+        super.openMainScreen();
         FragmentManager manager = getFragmentManager();
         if (manager.getBackStackEntryCount() > 0) {
             FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
@@ -100,7 +116,7 @@ public class MainActivity extends NavigationDrawerActivity implements SubredditF
     }
 
     public void onFragmentInteraction(int id) {
-        if (mode.equals(MODE_SUBREDDITS)) {
+        if (stateFragment.mode.equals(StateFragment.MODE_SUBREDDITS)) {
             Intent intent = new Intent(this, RedditController.class);
             intent.putExtra(RedditController.TYPE, RedditController.HELP_CLICKED_SUBREDDIT);
             intent.putExtra(RedditController.ID, id);
@@ -128,12 +144,12 @@ public class MainActivity extends NavigationDrawerActivity implements SubredditF
     };
 
     private void setSubreddits(Bundle bundle) {
-        subreddits = bundle.getStringArray(RedditController.RESULT);
-        subredditFragment.setList(bundle.getStringArray(RedditController.RESULT));
+        stateFragment.subreddits = bundle.getStringArray(RedditController.RESULT);
+        stateFragment.subredditFragment.setList(bundle.getStringArray(RedditController.RESULT));
     }
 
     private void setThreads(Bundle bundle) {
-        threads = bundle.getStringArray(RedditController.RESULT);
+        stateFragment.threads = bundle.getStringArray(RedditController.RESULT);
         //threadsFragment.setList(bundle.getStringArray(RedditController.RESULT));
     }
 
@@ -152,21 +168,21 @@ public class MainActivity extends NavigationDrawerActivity implements SubredditF
     public void onBackPressed() {
         if (getFragmentManager().getBackStackEntryCount() > 0 ){
             getFragmentManager().popBackStack();
-            if (mode.equals(MODE_COMMENTS))
-                mode = MODE_THREADS;
+            if (stateFragment.mode.equals(StateFragment.MODE_COMMENTS))
+                stateFragment.mode = StateFragment.MODE_THREADS;
             else
-                mode = MODE_SUBREDDITS;
+                stateFragment.mode = StateFragment.MODE_SUBREDDITS;
         } else {
             super.onBackPressed();
         }
     }
 
     protected void updateFragments() {
-        switch (mode) {
-            case MODE_SUBREDDITS:
-                subredditFragment.setList(subreddits);
+        switch (stateFragment.mode) {
+            case StateFragment.MODE_SUBREDDITS:
+                stateFragment.subredditFragment.setList(subreddits);
                 break;
-            case MODE_THREADS:
+            case StateFragment.MODE_THREADS:
                 //threadsFragment.setList(threads);
                 break;
         }

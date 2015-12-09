@@ -1,21 +1,79 @@
 package archon.tp_yarr_app;
 
+import android.content.Context;
+import android.database.Cursor;
+
+import net.dean.jraw.Endpoint;
+import net.dean.jraw.RedditClient;
+import net.dean.jraw.http.AuthenticationMethod;
+import net.dean.jraw.http.NetworkException;
+import net.dean.jraw.http.UserAgent;
+import net.dean.jraw.http.oauth.Credentials;
+import net.dean.jraw.http.oauth.OAuthData;
+import net.dean.jraw.http.oauth.OAuthException;
+import net.dean.jraw.http.oauth.OAuthHelper;
+import net.dean.jraw.models.JsonModel;
+import net.dean.jraw.models.Subreddit;
+
+import org.apache.http.conn.ConnectTimeoutException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+
+import archon.tp_yarr_app.Database.RedditDAO;
+import archon.tp_yarr_app.utils.OAuthDataWrapper;
 
 public class RedditAPI {
 
-    public static String[] loadSubreddits() {
-        imitateWork(500);
-        String[] values = new String[] { "API", "Destinygame", "HPMOR", "hearthstone",
-                "askreddit", "showerthoughts", "dota", "blizzard", "changemyview", "funny",
-                "undertale", "fallout", "hacking", "gamedev"
-        };
-        return values;
+    public static ArrayList<String> loadSubreddits(Context context) {
+
+        UserAgent userAgent = UserAgent.of(context.getString(R.string.user_agent));
+        RedditClient redditClient = new RedditClient(userAgent);
+
+        OAuthHelper helper = redditClient.getOAuthHelper();
+
+        RedditDAO dao = new RedditDAO(context);
+        OAuthData authData;
+        ArrayList<String> subreddits;
+        try {
+            dao.open();
+            if (dao.isLoggedIn()) {
+                authData = helper.refreshToken(OAuth.getCredentials(context));
+                redditClient.authenticate(authData);
+                subreddits = (ArrayList<String>) redditClient.getTrendingSubreddits();
+            } else {
+                authData = helper.easyAuth(OAuth.getUserlessCredentials(context));
+                redditClient.authenticate(authData);
+                subreddits = (ArrayList<String>) redditClient.getTrendingSubreddits();
+            }
+        } catch (SQLException | OAuthException s) {
+            return null;
+        }
+        dao.close();
+        return subreddits;
     }
 
-    private static void imitateWork(int n) {
-        int i = (new Random()).nextInt(n);
-        while (i != 42)
-            i = (new Random()).nextInt(n);
+    private static OAuthData retrieveOAuthData(Context context) {
+
+        RedditDAO dao = new RedditDAO(context);
+        OAuthDataWrapper result = new OAuthDataWrapper();
+        try {
+            dao.open();
+            Cursor cursor = dao.executeQuery("SELECT * FROM oauth;");
+            cursor.moveToFirst();
+            result.access_token = cursor.getString(1);
+            result.token_type = cursor.getString(2);
+            result.expires_in = cursor.getInt(3);
+            result.scope = cursor.getString(4);
+        } catch (SQLException s) {
+
+        }
+        dao.close();
+        return (OAuthData) result;
     }
 }

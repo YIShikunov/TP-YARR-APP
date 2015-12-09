@@ -26,10 +26,10 @@ public class RedditDAO {
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
         SubredditItem testItem = new SubredditItem();
-        testItem.setSname("testt");
+        /*testItem.setSname("testt");
         testItem.setID36("2222222");
         testItem.setPosition(0);
-        addSubreddit(testItem);
+        addSubreddit(testItem);*/
     }
 
     public void close() {
@@ -58,11 +58,38 @@ public class RedditDAO {
         return subreddits;
     }
 
+    public void updateRefreshToken(String token) {
+        removeRefreshToken();
+        database.rawQuery("INSERT INTO token (refresh_token) VALUES (?);", new String[]{token});
+    }
+
+    public String getRefreshToken() {
+        Cursor cursor = database.rawQuery("SELECT * FROM token;", null);
+        if (!cursor.moveToFirst())
+            return null;
+        return cursor.getString(1);
+    }
+
+    public void removeRefreshToken() {
+        database.rawQuery("DELETE FROM token;", null);
+    }
+
+    public boolean isLoggedIn() {
+        Cursor cursor = database.rawQuery("SELECT * FROM token;", null);
+        return cursor.moveToFirst();
+    }
+
     private SubredditItem parseCursor(Cursor cursor) {
         SubredditItem result = new SubredditItem();
         result.setSname(cursor.getString(1));
         result.setID36(cursor.getString(2));
         result.setPosition(cursor.getInt(3));
         return result;
+    }
+
+    public Cursor executeQuery(String query) {
+        // mostly for testing purposes
+        return database.rawQuery(query, null);
+
     }
 }
