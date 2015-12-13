@@ -2,6 +2,7 @@ package archon.tp_yarr_app.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.common.net.MediaType;
 
@@ -37,8 +39,12 @@ import archon.tp_yarr_app.Database.RedditDAO;
 import archon.tp_yarr_app.Database.RedditSQLiteHelper;
 import archon.tp_yarr_app.OAuth;
 import archon.tp_yarr_app.R;
+import archon.tp_yarr_app.RedditController;
 
 public class LoginActivity extends AppCompatActivity {
+
+    public boolean loginError = false;
+    private boolean setUp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,32 +58,16 @@ public class LoginActivity extends AppCompatActivity {
             throw new RuntimeException("Should not happen");
         }
 
-        Log.e("1", intent.getData().toString());
-
         String req = intent.getData().toString().replaceFirst("tpyarr", "http");
-        //req = req.replace("#", "?");
-        RedditClient client = new RedditClient(UserAgent.of(getString(R.string.user_agent)));
-        OAuthHelper helper = client.getOAuthHelper();
-        Credentials creds = OAuth.getCredentials(this);
-        //String url = helper.getAuthorizationUrl(creds, true).toString();
-/*
-        Pattern pattern = Pattern.compile("^.*state=([a-zA-Z0-9]+)&.*$");
-        Matcher matcher = pattern.matcher(url);
-        Log.e("1", matcher.find()?"match":"no match");
-        Log.e("1", String.valueOf(matcher.groupCount()));
-        String state = matcher.group(1);
-        Log.e("1", state);
-        req = req.replaceAll("TP_YARR_TOKEN", state);
-        Log.e("1", req);*/
 
-        OAuthData data;
+        Credentials creds = OAuth.getCredentials(this);
+        setUp = true;
         try {
-           new UserChallengeTask(helper, creds, getApplication()).execute(req);
-        } catch (IllegalStateException a) {
-            redirect();
-            return;
+           new UserChallengeTask(creds, this).execute(req);
+        } catch (IllegalStateException | IllegalArgumentException a) {
+            loginError = true;
         }
-        redirect();
+
     }
 
     private void redirect() {
@@ -86,14 +76,21 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (loginError)
+            Toast.makeText(this, "Login not finished.", Toast.LENGTH_LONG).show();
+        if (loginError || setUp) {
+            redirect();
+        }
+    }
 
     private static final class UserChallengeTask extends AsyncTask<String, Void, OAuthData> {
-        private OAuthHelper helper;
         private Credentials creds;
         private Context context;
 
-        public UserChallengeTask(OAuthHelper helper, Credentials creds, Context context) {
-            this.helper = helper;
+        public UserChallengeTask(Credentials creds, Context context) {
             this.creds = creds;
             this.context = context;
         }
@@ -101,11 +98,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected OAuthData doInBackground(String... params) {
             try {
-                //helper.onUserChallenge(params[0], creds);
                 HttpRequest request = HttpRequest.from("irrelevant", JrawUtils.newUrl(params[0]));
-                Log.e("1", request.toString());
                 Map<String, String> query = JrawUtils.parseUrlEncoded(request.getUrl().getQuery());
-                Log.e("1", query.toString());
                 if (!query.containsKey("state"))
                     throw new IllegalArgumentException("Final redirect URI did not contain the 'state' query parameter");
                 if (query.containsKey("error"))
@@ -114,8 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                     throw new IllegalArgumentException("Final redirect URI did not contain the 'code' parameter");
 
                 String code = query.get("code");
-                Log.e("1", code);
-                RedditClient reddit = new RedditClient(UserAgent.of("android:archon.tp_yarr_app:v0.0.1 (by /u/thetimujin)"));
+                RedditClient reddit = new RedditClient(OAuth.getUserAgent(context));
                 HttpRequest.Builder r = reddit.request()
                         .https(true)
                         .host(RedditClient.HOST_SPECIAL)
@@ -124,21 +117,15 @@ public class LoginActivity extends AppCompatActivity {
                         .post(JrawUtils.mapOf(
                                 "grant_type", "authorization_code",
                                 "code", code,
-                                "redirect_uri", "tpyarr://auth"
-                        )).header("Content-Type", "application/x-www-form-urlencoded").
-                                basicAuth(new BasicAuthData(creds.getClientId(), creds.getClientSecret()));
-
+                                "redirect_uri", context.getString(R.string.RED_URI)
+                        )).basicAuth(new BasicAuthData(creds.getClientId(), creds.getClientSecret()));
                 RestResponse response = reddit.execute(r.build());
-                Log.e("1", response.getJson().toString());
-                Log.e("2", response.getRaw());
                 OAuthData data = new OAuthData(creds.getAuthenticationMethod(), response.getJson());
-                Log.e("3", data.getRefreshToken());
                 recordAuthData(data.getRefreshToken());
-                return null;
-            } catch (NetworkException | OAuthException e) {
-                Log.e("2", "error");
+            } catch (NetworkException | OAuthException | IllegalArgumentException e) {
                 return null;
             }
+            return null;
         }
 
         public void recordAuthData(String token) {

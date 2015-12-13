@@ -2,32 +2,21 @@ package archon.tp_yarr_app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
-import net.dean.jraw.Endpoint;
 import net.dean.jraw.RedditClient;
-import net.dean.jraw.http.AuthenticationMethod;
-import net.dean.jraw.http.NetworkException;
+
 import net.dean.jraw.http.UserAgent;
-import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
 import net.dean.jraw.http.oauth.OAuthException;
 import net.dean.jraw.http.oauth.OAuthHelper;
-import net.dean.jraw.models.JsonModel;
 import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.Subreddit;
+import net.dean.jraw.paginators.Paginator;
+import net.dean.jraw.paginators.SubredditPaginator;
 import net.dean.jraw.paginators.UserSubredditsPaginator;
 
-import org.apache.http.conn.ConnectTimeoutException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import archon.tp_yarr_app.Database.RedditDAO;
 import archon.tp_yarr_app.utils.OAuthDataWrapper;
@@ -36,14 +25,13 @@ public class RedditAPI {
 
     public static ArrayList<String> loadSubreddits(Context context) {
 
-        UserAgent userAgent = UserAgent.of(context.getString(R.string.user_agent));
+        UserAgent userAgent = OAuth.getUserAgent(context);
         RedditClient redditClient = new RedditClient(userAgent);
-
         OAuthHelper helper = redditClient.getOAuthHelper();
-
         RedditDAO dao = new RedditDAO(context);
         OAuthData authData;
         ArrayList<String> subreddits;
+
         try {
             dao.open();
             if (dao.isLoggedIn()) {
@@ -56,12 +44,20 @@ public class RedditAPI {
                 for (Subreddit subreddit : submissions) {
                     subreddits.add(subreddit.getDisplayName());
                 }
-
             } else {
                 authData = helper.easyAuth(OAuth.getUserlessCredentials(context));
                 redditClient.authenticate(authData);
                 subreddits = (ArrayList<String>) redditClient.getTrendingSubreddits();
-                //Log.e("1", dao.getRefreshToken());
+                Paginator<Subreddit> paginator = new Paginator<Subreddit>(redditClient, Subreddit.class) {
+                    @Override
+                    protected String getBaseUri() {
+                        return "/subreddits/popular";
+                    }
+                };
+                Listing<Subreddit> submissions = paginator.next();
+                for (Subreddit subreddit : submissions) {
+                    subreddits.add(subreddit.getDisplayName());
+                }
             }
         } catch (SQLException | OAuthException s) {
             return null;

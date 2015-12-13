@@ -79,6 +79,9 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                     case R.id.menu_item_login:
                         initiateLogin();
                         return true;
+                    case R.id.menu_item_logout:
+                        initiateLogout();
+                        return true;
                     case R.id.menu_item_settings:
                         openSettings();
                         return true;
@@ -96,8 +99,9 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     protected void initiateLogin() {
         OAuth.initiateLogin(this);
-        //Intent i = new Intent(this, OAuthActivity.class);
-        //startActivity(i);
+    }
+    protected void initiateLogout() {
+        OAuth.initiateLogout(this);
     }
 
     protected void openMainScreen() {

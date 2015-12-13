@@ -75,7 +75,7 @@ public class RedditDAO {
     }
 
     public void removeRefreshToken() {
-        database.delete("token", "true", null);
+        database.delete("token", "1=1", null);
     }
 
     public boolean isLoggedIn() {
