@@ -13,6 +13,7 @@
 
     <string name="redirect_uri">redirect_uri=</string>
     <string name="RED_URI">tpyarr://auth</string>
+    <string name="FAKE_URI">http://auth</string>
 
     <string name="duration">duration=</string>
     <string name="DURATION">permanent</string>

@@ -49,7 +49,7 @@ public class OAuth {
     }
 
     public static Credentials getCredentials(Context context) {
-        return Credentials.installedApp(context.getString(R.string.CLIENT_ID), context.getString(R.string.RED_URI));
+        return Credentials.installedApp(context.getString(R.string.CLIENT_ID), context.getString(R.string.FAKE_URI));
     }
 
     public static Credentials getUserlessCredentials(Context context) {

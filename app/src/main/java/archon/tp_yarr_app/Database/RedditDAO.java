@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -60,7 +61,10 @@ public class RedditDAO {
 
     public void updateRefreshToken(String token) {
         removeRefreshToken();
-        database.rawQuery("INSERT INTO token (refresh_token) VALUES (?);", new String[]{token});
+        ContentValues n = new ContentValues();
+        n.put("refresh_token", token);
+        database.insert("token", null, n);
+        Log.e("QWE", getRefreshToken());
     }
 
     public String getRefreshToken() {
@@ -71,7 +75,7 @@ public class RedditDAO {
     }
 
     public void removeRefreshToken() {
-        database.rawQuery("DELETE FROM token;", null);
+        database.delete("token", "true", null);
     }
 
     public boolean isLoggedIn() {

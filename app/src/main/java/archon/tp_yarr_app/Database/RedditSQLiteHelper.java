@@ -11,7 +11,7 @@ public class RedditSQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "reddit.db";
 
     // Every time you change something in the schema, increment this
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String CREATE_SUBREDDITS =
             "CREATE TABLE subreddits (" +

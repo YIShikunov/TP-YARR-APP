@@ -96,6 +96,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     protected void initiateLogin() {
         OAuth.initiateLogin(this);
+        //Intent i = new Intent(this, OAuthActivity.class);
+        //startActivity(i);
     }
 
     protected void openMainScreen() {

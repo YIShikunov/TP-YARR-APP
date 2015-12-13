@@ -2,6 +2,7 @@ package archon.tp_yarr_app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import net.dean.jraw.Endpoint;
 import net.dean.jraw.RedditClient;
@@ -13,7 +14,10 @@ import net.dean.jraw.http.oauth.OAuthData;
 import net.dean.jraw.http.oauth.OAuthException;
 import net.dean.jraw.http.oauth.OAuthHelper;
 import net.dean.jraw.models.JsonModel;
+import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.Subreddit;
+import net.dean.jraw.paginators.UserSubredditsPaginator;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONObject;
@@ -43,13 +47,21 @@ public class RedditAPI {
         try {
             dao.open();
             if (dao.isLoggedIn()) {
+                helper.setRefreshToken(dao.getRefreshToken());
                 authData = helper.refreshToken(OAuth.getCredentials(context));
                 redditClient.authenticate(authData);
-                subreddits = (ArrayList<String>) redditClient.getTrendingSubreddits();
+                subreddits = new ArrayList<String>();
+                UserSubredditsPaginator paginator = new UserSubredditsPaginator(redditClient, "subscriber");
+                Listing<Subreddit> submissions = paginator.next();
+                for (Subreddit subreddit : submissions) {
+                    subreddits.add(subreddit.getDisplayName());
+                }
+
             } else {
                 authData = helper.easyAuth(OAuth.getUserlessCredentials(context));
                 redditClient.authenticate(authData);
                 subreddits = (ArrayList<String>) redditClient.getTrendingSubreddits();
+                //Log.e("1", dao.getRefreshToken());
             }
         } catch (SQLException | OAuthException s) {
             return null;
